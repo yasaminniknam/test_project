@@ -3,24 +3,28 @@ from flask import Flask,redirect, url_for, request,render_template,session
 import requests
 app = Flask(__name__)
 
-@app.route('/login',methods= ['POST','GET'])
+@app.route('/',methods= ['POST','GET'])
 def login():
-	if request.method=='POST':	
-		if request.form['Username']=='Admin' and request.form['Password']=='1234' :
+	
+	if request.method=='POST':
+		if  request.form['Username']=='Admin' and request.form['Password']=='1234' :
 			session['username']='Admin'
 			session['password']='1234'
 			return render_template('test1.html',user=session['username'])
+		else:
+			error="Invalid Password or username"
+			return render_template('login.html',error=error)
 	else:
-		error="Invalid Password or username"
+		error="" 
 		return render_template('login.html',error=error)
 
 @app.route('/main',methods = ['POST','GET'])
 def search():
-	if session['username']==Admin and session['password']=='1234' :	
-		if request.method=='POST':	
-			word = request.form['searched_word']
-			address="https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=&exsentences=2&explaintext=&format=json&redirects=&formatversion=2&titles=" + word
-			return render_template('aftersearch.html',data=requests.get(address).json()['query']['pages'][0]['extract'])
+		
+	if request.method=='POST':	
+		word = request.form['searched_word']
+		address="https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=&exsentences=2&explaintext=&format=json&redirects=&formatversion=2&titles=" + word
+		return render_template('aftersearch.html',data=requests.get(address).json()['query']['pages'][0]['extract'])
 	else :
 		error="Sorry!You cannot search till you login"
 		return render_template('login.html',error=error)
